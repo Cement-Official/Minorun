@@ -1,7 +1,7 @@
 var config = {
-  type: Phaser.AUTO, 
-  width: 1919,
-  height: 930, 
+  type: Phaser.AUTO,
+  width: 1920,
+  height: 919,
   physics: {
     default: "arcade",
     arcade: {
@@ -21,6 +21,7 @@ var platforms;
 var player;
 var score = 0;
 var scoreText;
+var lives = 3;
 
 function preload() {
   this.load.image("sky", "assets/sky.png");
@@ -68,7 +69,7 @@ function create() {
     frameRate: 10,
     repeat: -1,
   });
-  this.physics.add.collider(player, platforms); 
+  this.physics.add.collider(player, platforms);
   cursors = this.input.keyboard.createCursorKeys();
   stars = this.physics.add.group({
     key: "star",
@@ -85,6 +86,10 @@ function create() {
     star.disableBody(true, true);
   }
   scoreText = this.add.text(16, 16, "score: 0", {
+    fontSize: "32px",
+    fill: "#000",
+  });
+  livesText = this.add.text(1750, 16, "Lives: " + lives, {
     fontSize: "32px",
     fill: "#000",
   });
@@ -119,13 +124,14 @@ function create() {
     this.physics.pause();
 
     player.setTint(0xff0000);
+    
 
     player.anims.play("turn");
     WinText = this.add.text(230, 150, "Game Over", {
       fontSize: "60px",
       fill: "red",
     });
-    scoreText = this.add.text(260, 250, "score: 0", {
+    scoreText = this.add.text(260, 250, "Score: 0", {
       fontSize: "40px",
       fill: "red",
     });
@@ -142,10 +148,11 @@ function create() {
 
     gameOver = true;
   }
-} 
+}
 
 function update() {
-  platforms = this.physics.add.staticGroup(); 
+  platforms = this.physics.add.staticGroup();
+  livesText.setText("Lives: " + lives);
   if (cursors.left.isDown) {
     player.setVelocityX(-160);
 
@@ -161,6 +168,6 @@ function update() {
   }
 
   if (cursors.up.isDown && player.body.touching.down) {
-    player.setVelocityY(-330); 
+    player.setVelocityY(-330);
   }
 }
