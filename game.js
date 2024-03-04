@@ -6,7 +6,7 @@ var config = {
     default: "arcade",
     arcade: {
       gravity: { y: 321 },
-      debug: true,
+      debug: false,
     },
   },
   scene: {
@@ -19,14 +19,12 @@ var config = {
 var game = new Phaser.Game(config);
 var platforms;
 var player;
-var score = 0;
-var scoreText;
-var lives = 3;
 var worldwidth = 9600;
+var worldHeight = 1080;
 
 function preload() {
-  this.load.image("sky", "assets/sky.png");
-  this.load.image("ground", "assets/platform.png");
+  this.load.image("sky", "assets/sky-.png");
+  this.load.image("platform", "assets/platform.png");
   this.load.image("star", "assets/star.png");
   this.load.image("bomb", "assets/bomb.png");
   this.load.spritesheet("dude", "assets/dude.png", {
@@ -36,30 +34,36 @@ function preload() {
 }
 
 function create() {
-  //this.add.image(550, 350, "sky");
+  this.add
+    .tileSprite(0, 0, worldwidth, worldHeight, "sky")
+    .setOrigin(0, 0)
 
-  this.add.tileSprite(0, 0, worldwidth, worldHeight, "sky"), setOrigin(0, 0);
-
-  this.physics.world.bounds.width = worldwidth;
-  this.physics.world.bounds.height = worldHeight;
+  //this.physics.world.bounds.width = worldwidth;
+  //this.physics.world.bounds.height = worldHeight;
 
   platforms = this.physics.add.staticGroup();
 
-  for (var x = 0; x < worldwidth; x = x + 400) {
-    console.log(x)
-    platforms.create(x, 1100, "platform").setOrigin(0, 0).refreshBody();
+  for (var x = 0; x < worldwidth; x = x + 500) {
+    //console.log(x);
+    platforms
+      .create(x, 1080 - 70, "platform")
+      .setOrigin(0, 0)
+      .refreshBody();
   }
 
-  player = this.physics.add.sprite(100, 450, "dude");
+  player = this.physics.add.sprite(100, 500, "dude");
 
   player.setBounce(0.2);
   player.setCollideWorldBounds(true);
+
+  this.physics.add.collider(player, platforms);
 
   this.cameras.main.setBounds(0, 0, worldwidth, window.innerHeight);
   this.physics.world.setBounds(0, 0, worldwidth, window.innerHeight);
 
   this.cameras.main.startFollow(player);
 
+  //
   this.anims.create({
     key: "left",
     frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
@@ -79,19 +83,17 @@ function create() {
     frameRate: 10,
     repeat: -1,
   });
-  this.physics.add.collider(player, platforms);
+
   cursors = this.input.keyboard.createCursorKeys();
 }
 
 function update() {
-  platforms = this.physics.add.staticGroup();
-
   if (cursors.left.isDown) {
-    player.setVelocityX(-160);
+    player.setVelocityX(-3000);
 
     player.anims.play("left", true);
   } else if (cursors.right.isDown) {
-    player.setVelocityX(160);
+    player.setVelocityX(3000);
 
     player.anims.play("right", true);
   } else {
