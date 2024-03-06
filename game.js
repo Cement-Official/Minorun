@@ -5,7 +5,7 @@ var config = {
   physics: {
     default: "arcade",
     arcade: {
-      gravity: { y: 321 },
+      gravity: { y: 30 },
       debug: false,
     },
   },
@@ -19,14 +19,21 @@ var config = {
 var game = new Phaser.Game(config);
 var platforms;
 var player;
-var worldwidth = 9600;
+var worldwidth = config.width * 20;
 var worldHeight = 1080;
+var yStart = 93;
 
 function preload() {
   this.load.image("sky", "assets/sky-.png");
   this.load.image("platform", "assets/platform.png");
   this.load.image("star", "assets/star.png");
   this.load.image("bomb", "assets/bomb.png");
+  this.load.image("tree", "assets/Tree.png");
+  this.load.image("stone", "assets/Stone.png");
+  this.load.image("bush", "assets/Bush.png");
+  this.load.image("platform1", "assets/13.png");
+  this.load.image("platform2", "assets/14.png");
+  this.load.image("platform3", "assets/15.png");
   this.load.spritesheet("dude", "assets/dude.png", {
     frameWidth: 32,
     frameHeight: 48,
@@ -34,9 +41,7 @@ function preload() {
 }
 
 function create() {
-  this.add
-    .tileSprite(0, 0, worldwidth, worldHeight, "sky")
-    .setOrigin(0, 0)
+  this.add.tileSprite(0, 0, worldwidth, worldHeight, "sky").setOrigin(0, 0);
 
   //this.physics.world.bounds.width = worldwidth;
   //this.physics.world.bounds.height = worldHeight;
@@ -51,7 +56,7 @@ function create() {
       .refreshBody();
   }
 
-  player = this.physics.add.sprite(100, 500, "dude");
+  player = this.physics.add.sprite(400, 600, "dude");
 
   player.setBounce(0.2);
   player.setCollideWorldBounds(true);
@@ -84,7 +89,53 @@ function create() {
     repeat: -1,
   });
 
+  for (var x = 0; x < worldwidth; x = x + Phaser.Math.Between(700, 1100)) {
+    console.log(x);
+    bush = this.physics.add
+      .sprite(x, 1000, "bush")
+      .setOrigin(2, 1)
+      .setDepth(Phaser.Math.Between(0.5, 2))
+      .setScale(Phaser.Math.FloatBetween(0.5, 1));
+    this.physics.add.collider(bush, platforms);
+  }
+
+  for (var x = 0; x < worldwidth; x = x + Phaser.Math.Between(1000, 2000)) {
+    console.log(x);
+    tree = this.physics.add
+      .sprite(x, 1000, "tree")
+      .setOrigin(-1, 1)
+      .setDepth(Phaser.Math.Between(0.5, 2))
+      .setScale(Phaser.Math.FloatBetween(1, 1.6));
+    this.physics.add.collider(tree, platforms);
+  }
+
+  for (var x = 0; x < worldwidth; x = x + Phaser.Math.Between(900, 1400)) {
+    console.log(x);
+    stone = this.physics.add
+      .sprite(x, 1000, "stone")
+      .setOrigin(0, 1)
+      .setDepth(Phaser.Math.Between(0.5, 2))
+      .setScale(Phaser.Math.FloatBetween(0.5, 1));
+    this.physics.add.collider(stone, platforms);
+  }
+
+  for (var x = 0; x < worldwidth; x = x + Phaser.Math.Between(400, 500)) {
+    
+    var yStep = Phaser.Math.Between(-1, 1);
+    var y = yStart * yStep
+
+    platforms.create(x, y, "platform1");
+
+    var i;
+    for (i = 1; i < Phaser.Math.Between(0, 5); i++) {
+      platforms.create(x + 128 * i, y, "platform2");
+    }
+
+    platforms.create(x + 128*i, y, "platform3");
+  }
+
   cursors = this.input.keyboard.createCursorKeys();
+  stone = this.physics.add.staticGroup();
 }
 
 function update() {
