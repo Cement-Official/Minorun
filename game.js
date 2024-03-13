@@ -21,7 +21,8 @@ var platforms;
 var player;
 var worldwidth = config.width * 20;
 var worldHeight = 1080;
-var yStart = 93;
+var yStart = 200;
+var life = 5;
 
 function preload() {
   this.load.image("sky", "assets/sky-.png");
@@ -120,9 +121,8 @@ function create() {
   }
 
   for (var x = 0; x < worldwidth; x = x + Phaser.Math.Between(400, 500)) {
-    
-    var yStep = Phaser.Math.Between(-1, 1);
-    var y = yStart * yStep
+    var yStep = Phaser.Math.Between(1, 3);
+    var y = yStart * yStep;
 
     platforms.create(x, y, "platform1");
 
@@ -131,7 +131,7 @@ function create() {
       platforms.create(x + 128 * i, y, "platform2");
     }
 
-    platforms.create(x + 128*i, y, "platform3");
+    platforms.create(x + 128 * i, y, "platform3");
   }
 
   cursors = this.input.keyboard.createCursorKeys();
