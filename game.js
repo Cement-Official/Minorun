@@ -5,7 +5,7 @@ var config = {
   physics: {
     default: "arcade",
     arcade: {
-      gravity: { y: 30 },
+      gravity: { y: 110 },
       debug: false,
     },
   },
@@ -24,6 +24,7 @@ var worldHeight = 1080;
 var yStart = 200;
 var life = 5;
 
+//assets
 function preload() {
   this.load.image("sky", "assets/sky-.png");
   this.load.image("platform", "assets/platform.png");
@@ -51,12 +52,10 @@ function create() {
 
   for (var x = 0; x < worldwidth; x = x + 500) {
     //console.log(x);
-    platforms
-      .create(x, 1080 - 70, "platform")
-      .setOrigin(0, 0)
-      .refreshBody();
+    platforms.create(x, 1000, "platform").setOrigin(0, 0).refreshBody();
   }
-
+  
+  //dude
   player = this.physics.add.sprite(400, 600, "dude");
 
   player.setBounce(0.2);
@@ -69,7 +68,7 @@ function create() {
 
   this.cameras.main.startFollow(player);
 
-  //
+  //dude_movements
   this.anims.create({
     key: "left",
     frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
@@ -90,6 +89,7 @@ function create() {
     repeat: -1,
   });
 
+  //перешкоди
   for (var x = 0; x < worldwidth; x = x + Phaser.Math.Between(700, 1100)) {
     console.log(x);
     bush = this.physics.add
@@ -120,6 +120,7 @@ function create() {
     this.physics.add.collider(stone, platforms);
   }
 
+  //летючі платформи
   for (var x = 0; x < worldwidth; x = x + Phaser.Math.Between(400, 500)) {
     var yStep = Phaser.Math.Between(1, 3);
     var y = yStart * yStep;
