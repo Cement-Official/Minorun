@@ -23,6 +23,8 @@ var worldwidth = config.width * 20;
 var worldHeight = 1080;
 var yStart = 200;
 var life = 5;
+var score = 0;
+var scoreText;
 
 //assets
 function preload() {
@@ -40,6 +42,10 @@ function preload() {
     frameWidth: 32,
     frameHeight: 48,
   });
+  this.load.spritesheet("enemy", "assets/Minotaur.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
 }
 
 function create() {
@@ -54,7 +60,7 @@ function create() {
     //console.log(x);
     platforms.create(x, 1000, "platform").setOrigin(0, 0).refreshBody();
   }
-  
+
   //dude
   player = this.physics.add.sprite(400, 600, "dude");
 
@@ -137,8 +143,48 @@ function create() {
 
   cursors = this.input.keyboard.createCursorKeys();
   stone = this.physics.add.staticGroup();
-}
+  //зірки
+  stars = this.physics.add.group({
+    key: "star",
+    repeat: 30,
+    setXY: { x: 20, y: 0, stepX: 1100 },
+  });
 
+  stars.children.iterate(function (child) {
+    child.setBounceY(Phaser.Math.FloatBetween(0, 0.1));
+  });
+  this.physics.add.collider(stars, platforms);
+  this.physics.add.overlap(player, stars, collectStar, null, this);
+  
+  function collectStar(player, star) {
+    star.disableBody(true, true);
+  }
+  scoreText = this.add
+    .text(16, 16, "Score: 0", {
+      fontSize: "32px",
+      fill: "#000",
+    })
+    .setScrollFactor(0);
+  //рахунок
+  function collectStar(player, star) {
+    star.disableBody(true, true);
+
+    score += 10;
+    scoreText.setText("Score: " + score);
+
+    if (stars.countActive(true) === 0) {
+      stars.children.iterate(function (child) {
+        child.enableBody(true, child.x, 0, true, true);
+      });
+
+      var x =
+        player.x < 400
+          ? Phaser.Math.Between(400, 800)
+          : Phaser.Math.Between(0, 400);
+    }
+  }
+}
+//function update
 function update() {
   if (cursors.left.isDown) {
     player.setVelocityX(-3000);
