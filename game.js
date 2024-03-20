@@ -19,7 +19,9 @@ var config = {
 var game = new Phaser.Game(config);
 var platforms;
 var player;
-var worldwidth = config.width * 20;
+var screenCount = 2;
+var worldwidth = config.width * screenCount;
+var enemyCount = screenCount;
 var worldHeight = 1080;
 var yStart = 200;
 var life = 5;
@@ -43,8 +45,8 @@ function preload() {
     frameHeight: 48,
   });
   this.load.spritesheet("enemy", "assets/Minotaur.png", {
-    frameWidth: 32,
-    frameHeight: 48,
+    frameWidth: 53,
+    frameHeight: 41,
   });
 }
 
@@ -95,9 +97,11 @@ function create() {
     repeat: -1,
   });
 
+  //lifes
+
   //перешкоди
   for (var x = 0; x < worldwidth; x = x + Phaser.Math.Between(700, 1100)) {
-    console.log(x);
+    // console.log(x);
     bush = this.physics.add
       .sprite(x, 1000, "bush")
       .setOrigin(2, 1)
@@ -107,7 +111,7 @@ function create() {
   }
 
   for (var x = 0; x < worldwidth; x = x + Phaser.Math.Between(1000, 2000)) {
-    console.log(x);
+    // console.log(x);
     tree = this.physics.add
       .sprite(x, 1000, "tree")
       .setOrigin(-1, 1)
@@ -143,6 +147,56 @@ function create() {
 
   cursors = this.input.keyboard.createCursorKeys();
   stone = this.physics.add.staticGroup();
+
+  //додає ворогів
+
+  enemy = this.physics.add.group({
+    key: "enemy",
+    repeat: enemyCount,
+    setXY: {
+      x: 1000,
+      y: 1080 - 150,
+      stepX: Phaser.Math.FloatBetween(-500, 500),
+    },
+  });
+
+  enemy.children.iterate(function (child) {
+    child
+      .setCollideWorldBounds(true)
+      .setVelocityX(Phaser.Math.FloatBetween(-500, 500));
+  });
+
+  //колізія ворогів та платформ
+  this.physics.add.collider(enemy, platforms);
+
+  //колізія ворогів та гравця
+  this.physics.add.collider(player, enemy, (enemy) => {
+    player.x = player.x + Phaser.Math.FloatBetween(-50, 50);
+    player.y = player.y - Phaser.Math.FloatBetween(200, 400);
+    lifeText.setText(showTextSymbols('❤️', life - 1))
+  }, null, this);
+
+  //enemy animations
+  this.anims.create({
+    key: "left",
+    frames: this.anims.generateFrameNumbers("enemy", { start: 0, end: 7 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+
+  this.anims.create({
+    key: "turn",
+    frames: [{ key: "enemy", frame: 8 }],
+    frameRate: 20,
+  });
+
+  this.anims.create({
+    key: "right",
+    frames: this.anims.generateFrameNumbers("enemy", { start: 9, end: 17 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+
   //зірки
   stars = this.physics.add.group({
     key: "star",
@@ -155,7 +209,7 @@ function create() {
   });
   this.physics.add.collider(stars, platforms);
   this.physics.add.overlap(player, stars, collectStar, null, this);
-  
+
   function collectStar(player, star) {
     star.disableBody(true, true);
   }
@@ -164,6 +218,24 @@ function create() {
       fontSize: "32px",
       fill: "#000",
     })
+    .setScrollFactor(0);
+
+  function showTextSymbols(symbol, count) {
+    var symbolLine = "";
+
+    for (var i = 0; i < count; i++) {
+      symbolLine = symbolLine + symbol;
+    }
+
+    return symbolLine;
+  }
+
+  lifeText = this.add
+    .text(1610, 15, showTextSymbols("❤️", life), {
+      fontSize: "40px",
+      fill: "#FFF",
+    })
+    .setOrigin(0, 0)
     .setScrollFactor(0);
   //рахунок
   function collectStar(player, star) {
@@ -186,6 +258,16 @@ function create() {
 }
 //function update
 function update() {
+  //агро радіус
+  if (Math.abs(player.x - enemy.x) < 600) {
+    enemy.moveTo(player,player.x,player.y, 300,1)
+  }
+
+  if (life === 0) {
+    refreshBody();
+  }
+
+
   if (cursors.left.isDown) {
     player.setVelocityX(-3000);
 
@@ -203,4 +285,9 @@ function update() {
   if (cursors.up.isDown && player.body.touching.down) {
     player.setVelocityY(-330);
   }
+  enemy.children.iterate((child) => {
+    if (Math.random() < 0.01) {
+      child.setVelocityX(Phaser.Math.FloatBetween(-500,500))
+    }
+  })
 }
