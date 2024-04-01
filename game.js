@@ -5,7 +5,7 @@ var config = {
   physics: {
     default: "arcade",
     arcade: {
-      gravity: { y: 110 },
+      gravity: { y: 1400 },
       debug: false,
     },
   },
@@ -19,7 +19,7 @@ var config = {
 var game = new Phaser.Game(config);
 var platforms;
 var player;
-var screenCount = 2;
+var screenCount = 10;
 var worldwidth = config.width * screenCount;
 var enemyCount = screenCount;
 var worldHeight = 1080;
@@ -34,6 +34,7 @@ function preload() {
   this.load.image("platform", "assets/platform.png");
   this.load.image("star", "assets/star.png");
   this.load.image("bomb", "assets/bomb.png");
+  this.load.image("heart", "assets/heart.png");
   this.load.image("tree", "assets/Tree.png");
   this.load.image("stone", "assets/Stone.png");
   this.load.image("bush", "assets/Bush.png");
@@ -129,10 +130,26 @@ function create() {
       .setScale(Phaser.Math.FloatBetween(0.5, 1));
     this.physics.add.collider(stone, platforms);
   }
+  //hearts
+    for (var x = 0; x < worldwidth; x = x + Phaser.Math.Between(1500, 2000)) {
+    console.log(x);
+    heart = this.physics.add
+      .sprite(x, 1000, "heart")
+      .setOrigin(0, 1)
+      .setDepth(2)
+      .setScale(0.08);
+      this.physics.add.collider(heart, platforms);
+      this.physics.add.overlap(player, heart, collectheart, null, this);
+
+      function collectheart(player, heart) {
+        heart.disableBody(true, true);
+        lifeText.setText(showTextSymbols('❤️', life = life + 1))
+     }
+  }
 
   //летючі платформи
-  for (var x = 0; x < worldwidth; x = x + Phaser.Math.Between(400, 500)) {
-    var yStep = Phaser.Math.Between(1, 3);
+  for (var x = 0; x < worldwidth; x = x + Phaser.Math.Between(300, 500)) {
+    var yStep = Phaser.Math.Between(1, 4);
     var y = yStart * yStep;
 
     platforms.create(x, y, "platform1");
@@ -154,16 +171,16 @@ function create() {
     key: "enemy",
     repeat: enemyCount,
     setXY: {
-      x: 1000,
-      y: 1080 - 150,
-      stepX: Phaser.Math.FloatBetween(-500, 500),
+      x: 1500,
+      y: 930,
+      stepX: Phaser.Math.FloatBetween(-600, 1000),
     },
   });
 
   enemy.children.iterate(function (child) {
     child
       .setCollideWorldBounds(true)
-      .setVelocityX(Phaser.Math.FloatBetween(-500, 500));
+      .setVelocityX(Phaser.Math.FloatBetween(-600, 2000));
   });
 
   //колізія ворогів та платформ
@@ -171,9 +188,9 @@ function create() {
 
   //колізія ворогів та гравця
   this.physics.add.collider(player, enemy, (enemy) => {
-    player.x = player.x + Phaser.Math.FloatBetween(-50, 50);
+    player.x = player.x + Phaser.Math.FloatBetween(-50, 30);
     player.y = player.y - Phaser.Math.FloatBetween(200, 400);
-    lifeText.setText(showTextSymbols('❤️', life - 1))
+    lifeText.setText(showTextSymbols('❤️', life = life - 1))
   }, null, this);
 
   //enemy animations
@@ -231,7 +248,7 @@ function create() {
   }
 
   lifeText = this.add
-    .text(1610, 15, showTextSymbols("❤️", life), {
+    .text(1100, 15, showTextSymbols("❤️", life), {
       fontSize: "40px",
       fill: "#FFF",
     })
@@ -264,16 +281,17 @@ function update() {
   }
 
   if (life === 0) {
-    refreshBody();
+    console.log('game over')
+    restartGame();
   }
 
 
   if (cursors.left.isDown) {
-    player.setVelocityX(-3000);
+    player.setVelocityX(-1000);
 
     player.anims.play("left", true);
   } else if (cursors.right.isDown) {
-    player.setVelocityX(3000);
+    player.setVelocityX(1000);
 
     player.anims.play("right", true);
   } else {
@@ -283,11 +301,15 @@ function update() {
   }
 
   if (cursors.up.isDown && player.body.touching.down) {
-    player.setVelocityY(-330);
+    player.setVelocityY(-1200);
   }
   enemy.children.iterate((child) => {
     if (Math.random() < 0.01) {
       child.setVelocityX(Phaser.Math.FloatBetween(-500,500))
     }
   })
+
+  function restartGame() {
+    location.reload();
+  }
 }
