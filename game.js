@@ -172,7 +172,7 @@ function create() {
     repeat: enemyCount,
     setXY: {
       x: 1500,
-      y: 930,
+      y: 500,
       stepX: Phaser.Math.FloatBetween(-600, 1000),
     },
   });
