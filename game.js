@@ -72,8 +72,9 @@ function create() {
 
   this.physics.add.collider(player, platforms);
 
-  this.cameras.main.setBounds(0, 0, worldwidth, window.innerHeight);
-  this.physics.world.setBounds(0, 0, worldwidth, window.innerHeight);
+  //камера
+  this.cameras.main.setBounds(0, 0, worldwidth, config.height);
+  this.physics.world.setBounds(0, 0, worldwidth, config.height);
 
   this.cameras.main.startFollow(player);
 
